@@ -1,4 +1,4 @@
-# BridgeTrace AI
+ # BridgeTrace AI
 ### Unified Financial Traceability Engine for Banking, PIX and Crypto
 
 BridgeTrace AI is a research-grade Python system designed to **model, correlate and explain financial flows across traditional banking systems (including PIX) and blockchain networks**, using **graph theory and Generative AI**.
