@@ -1,0 +1,18 @@
+[
+  {
+    "transaction_id": "PIX_1001",
+    "from_account": "ACC_001",
+    "to_account": "ACC_002",
+    "amount": 980.0,
+    "timestamp": "2025-01-10T02:34:00",
+    "pix_key": "PIX_KEY_002"
+  },
+  {
+    "transaction_id": "PIX_1002",
+    "from_account": "ACC_002",
+    "to_account": "ACC_001",
+    "amount": 1500.0,
+    "timestamp": "2025-01-11T23:12:00",
+    "pix_key": "PIX_KEY_001"
+  }
+]
