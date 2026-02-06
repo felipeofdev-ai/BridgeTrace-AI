@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BridgeTrace AI - Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-project-diagram"></i>
+                    <h1>BridgeTrace AI</h1>
+                </div>
+                <nav class="nav">
+                    <a href="#dashboard" class="nav-link active" data-section="dashboard">
+                        <i class="fas fa-chart-line"></i> Dashboard
+                    </a>
+                    <a href="#trace" class="nav-link" data-section="trace">
+                        <i class="fas fa-route"></i> Rastreamento
+                    </a>
+                    <a href="#risk" class="nav-link" data-section="risk">
+                        <i class="fas fa-shield-alt"></i> Análise de Risco
+                    </a>
+                    <a href="#nodes" class="nav-link" data-section="nodes">
+                        <i class="fas fa-network-wired"></i> Nós
+                    </a>
+                    <a href="#docs" class="nav-link" data-section="docs">
+                        <i class="fas fa-book"></i> Documentação
+                    </a>
+                </nav>
+                <div class="header-actions">
+                    <button class="btn-icon" id="themeToggle">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <div class="status-indicator">
+                        <span class="status-dot"></span>
+                        <span class="status-text">API Conectada</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            
+            <!-- Dashboard Section -->
+            <section id="section-dashboard" class="content-section active">
+                <div class="section-header">
+                    <h2><i class="fas fa-chart-line"></i> Dashboard Geral</h2>
+                    <p class="subtitle">Visão unificada do sistema de rastreabilidade financeira</p>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon bank">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stat-nodes">0</h3>
+                            <p>Nós no Grafo</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon transactions">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stat-transactions">0</h3>
+                            <p>Transações</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon volume">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stat-volume">R$ 0</h3>
+                            <p>Volume Total</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon risk">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stat-risk">0.0</h3>
+                            <p>Score Médio de Risco</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="charts-row">
+                    <div class="chart-card">
+                        <h3><i class="fas fa-pie-chart"></i> Distribuição de Nós</h3>
+                        <canvas id="nodeDistributionChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3><i class="fas fa-chart-bar"></i> Volume por Canal</h3>
+                        <canvas id="channelVolumeChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Network Graph -->
+                <div class="graph-card">
+                    <div class="graph-header">
+                        <h3><i class="fas fa-project-diagram"></i> Grafo de Transações</h3>
+                        <div class="graph-controls">
+                            <button class="btn-secondary" id="resetGraph">
+                                <i class="fas fa-sync"></i> Resetar Visualização
+                            </button>
+                        </div>
+                    </div>
+                    <div id="networkGraph" class="network-graph"></div>
+                </div>
+            </section>
+
+            <!-- Trace Section -->
+            <section id="section-trace" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-route"></i> Rastreamento de Fluxo Financeiro</h2>
+                    <p class="subtitle">Rastreie o caminho de fundos através de múltiplos saltos</p>
+                </div>
+
+                <div class="form-card">
+                    <h3>Configurar Rastreamento</h3>
+                    <form id="traceForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="sourceNode">Nó de Origem</label>
+                                <select id="sourceNode" class="form-control" required>
+                                    <option value="">Selecione um nó...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="maxHops">Máximo de Saltos</label>
+                                <input type="number" id="maxHops" class="form-control" value="5" min="1" max="10">
+                            </div>
+                            <div class="form-group">
+                                <label for="minAmount">Valor Mínimo (R$)</label>
+                                <input type="number" id="minAmount" class="form-control" value="0" min="0" step="0.01">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-search"></i> Iniciar Rastreamento
+                        </button>
+                    </form>
+                </div>
+
+                <div id="traceResults" class="results-card" style="display: none;">
+                    <h3>Resultados do Rastreamento</h3>
+                    <div id="traceResultsContent"></div>
+                </div>
+            </section>
+
+            <!-- Risk Analysis Section -->
+            <section id="section-risk" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-shield-alt"></i> Análise de Risco</h2>
+                    <p class="subtitle">Avalie padrões comportamentais e indicadores de risco</p>
+                </div>
+
+                <div class="form-card">
+                    <h3>Configurar Análise</h3>
+                    <form id="riskForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="entityNode">Entidade</label>
+                                <select id="entityNode" class="form-control" required>
+                                    <option value="">Selecione uma entidade...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="timeRange">Período (dias)</label>
+                                <input type="number" id="timeRange" class="form-control" value="30" min="1" max="365">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-chart-line"></i> Analisar Risco
+                        </button>
+                    </form>
+                </div>
+
+                <div id="riskResults" class="results-card" style="display: none;">
+                    <h3>Resultados da Análise</h3>
+                    <div id="riskResultsContent"></div>
+                </div>
+            </section>
+
+            <!-- Nodes Section -->
+            <section id="section-nodes" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-network-wired"></i> Gerenciamento de Nós</h2>
+                    <p class="subtitle">Visualize e filtre todos os nós do sistema</p>
+                </div>
+
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label>Tipo de Nó:</label>
+                        <select id="nodeTypeFilter" class="form-control">
+                            <option value="">Todos</option>
+                            <option value="bank_account">Contas Bancárias</option>
+                            <option value="pix_key">Chaves PIX</option>
+                            <option value="crypto_wallet">Carteiras Crypto</option>
+                            <option value="entity">Entidades</option>
+                        </select>
+                    </div>
+                    <button class="btn-secondary" id="refreshNodes">
+                        <i class="fas fa-sync"></i> Atualizar
+                    </button>
+                </div>
+
+                <div id="nodesGrid" class="nodes-grid">
+                    <!-- Nodes will be loaded here -->
+                </div>
+            </section>
+
+            <!-- Documentation Section -->
+            <section id="section-docs" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-book"></i> Documentação da API</h2>
+                    <p class="subtitle">Guia de uso e endpoints disponíveis</p>
+                </div>
+
+                <div class="docs-card">
+                    <h3>Endpoints Principais</h3>
+                    
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method get">GET</span>
+                            <code>/api/health</code>
+                        </div>
+                        <p>Verifica o status da API</p>
+                    </div>
+
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method get">GET</span>
+                            <code>/api/nodes</code>
+                        </div>
+                        <p>Retorna todos os nós do grafo financeiro</p>
+                        <div class="endpoint-params">
+                            <strong>Parâmetros:</strong>
+                            <ul>
+                                <li><code>node_type</code> (opcional) - Filtra por tipo de nó</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method get">GET</span>
+                            <code>/api/transactions</code>
+                        </div>
+                        <p>Retorna histórico de transações</p>
+                        <div class="endpoint-params">
+                            <strong>Parâmetros:</strong>
+                            <ul>
+                                <li><code>limit</code> - Número máximo de transações</li>
+                                <li><code>min_amount</code> - Valor mínimo da transação</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method post">POST</span>
+                            <code>/api/trace</code>
+                        </div>
+                        <p>Rastreia fluxo financeiro a partir de um nó</p>
+                        <div class="endpoint-params">
+                            <strong>Body:</strong>
+                            <pre>{
+  "source_id": "bank_001",
+  "max_hops": 5,
+  "min_amount": 0.0
+}</pre>
+                        </div>
+                    </div>
+
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method post">POST</span>
+                            <code>/api/risk-analysis</code>
+                        </div>
+                        <p>Realiza análise de risco de uma entidade</p>
+                        <div class="endpoint-params">
+                            <strong>Body:</strong>
+                            <pre>{
+  "entity_id": "entity_001",
+  "time_range_days": 30
+}</pre>
+                        </div>
+                    </div>
+
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method get">GET</span>
+                            <code>/api/statistics</code>
+                        </div>
+                        <p>Retorna estatísticas gerais do sistema</p>
+                    </div>
+
+                    <div class="api-links">
+                        <a href="/api/docs" target="_blank" class="btn-primary">
+                            <i class="fas fa-external-link-alt"></i> Swagger UI
+                        </a>
+                        <a href="/api/redoc" target="_blank" class="btn-secondary">
+                            <i class="fas fa-book"></i> ReDoc
+                        </a>
+                    </div>
+                </div>
+
+                <div class="docs-card">
+                    <h3>Sobre o Projeto</h3>
+                    <p>BridgeTrace AI é um sistema de rastreabilidade financeira que modela e correlaciona fluxos financeiros através de sistemas bancários tradicionais (incluindo PIX) e redes blockchain.</p>
+                    
+                    <h4>Funcionalidades Principais:</h4>
+                    <ul>
+                        <li>Modelagem unificada de grafos (banking + crypto)</li>
+                        <li>Correlação probabilística de entidades</li>
+                        <li>Rastreamento multi-hop de transações</li>
+                        <li>Scoring de risco baseado em padrões comportamentais</li>
+                        <li>Explicações geradas por IA para compliance</li>
+                    </ul>
+
+                    <div class="warning-box">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Aviso:</strong> Este projeto utiliza 100% dados sintéticos e simulados. Não se conecta a sistemas reais do Banco Central, PIX, APIs bancárias ou redes blockchain ativas.
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 BridgeTrace AI - Unified Financial Traceability Engine</p>
+            <p>Desenvolvido por Felipe de Oliveira Fernandes | <a href="https://github.com/felipeofdev-ai/BridgeTrace-AI" target="_blank">GitHub</a></p>
+        </div>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+        <p>Carregando...</p>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
