@@ -2,6 +2,11 @@
 
 <div align="center">
 
+![Python](https://img.shields.io/badge/Python-3.9+-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green)
+![License](https://img.shields.io/badge/License-MIT-yellow)
+![Status](https://img.shields.io/badge/Status-Active-success)
+
 ![BridgeTrace AI](https://img.shields.io/badge/BridgeTrace-AI-blue?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.9+-green?style=for-the-badge&logo=python)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-teal?style=for-the-badge&logo=fastapi)
