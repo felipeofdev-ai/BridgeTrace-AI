@@ -1,0 +1,18 @@
+[
+  {
+    "account_id": "ACC_001",
+    "entity_id": "ENT_001",
+    "bank": "SyntheticBank",
+    "avg_transaction_value": 450.0,
+    "active_hours": [8, 18],
+    "risk_flags": 0
+  },
+  {
+    "account_id": "ACC_002",
+    "entity_id": "ENT_002",
+    "bank": "SyntheticBank",
+    "avg_transaction_value": 1200.0,
+    "active_hours": [0, 23],
+    "risk_flags": 1
+  }
+]

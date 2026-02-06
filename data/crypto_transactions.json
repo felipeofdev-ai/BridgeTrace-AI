@@ -1,0 +1,10 @@
+[
+  {
+    "tx_id": "CRYPTO_TX_9001",
+    "from_wallet": "WALLET_A",
+    "to_wallet": "WALLET_B",
+    "amount": 1050.0,
+    "timestamp": "2025-01-12T03:10:00",
+    "blockchain": "Ethereum"
+  }
+]

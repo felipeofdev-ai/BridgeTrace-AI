@@ -1,0 +1,16 @@
+[
+  {
+    "wallet_id": "WALLET_A",
+    "entity_id": "ENT_002",
+    "blockchain": "Ethereum",
+    "avg_transaction_value": 1100.0,
+    "active_hours": [0, 23]
+  },
+  {
+    "wallet_id": "WALLET_B",
+    "entity_id": "ENT_003",
+    "blockchain": "Bitcoin",
+    "avg_transaction_value": 300.0,
+    "active_hours": [9, 17]
+  }
+]
