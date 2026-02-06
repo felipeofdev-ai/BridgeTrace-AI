@@ -1,0 +1,29 @@
+# BridgeTrace AI - Python Dependencies
+
+# FastAPI Framework
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+
+# CORS Support
+python-multipart==0.0.17
+
+# Data Validation
+pydantic==2.9.2
+pydantic-settings==2.5.2
+
+# Optional: Database (if needed in future)
+# sqlalchemy==2.0.35
+# alembic==1.13.3
+
+# Optional: Graph Processing (if needed)
+# networkx==3.4.1
+# pandas==2.2.3
+
+# Optional: AI/ML (for future GenAI integration)
+# openai==1.50.0
+# anthropic==0.39.0
+
+# Development Tools
+pytest==8.3.3
+black==24.10.0
+flake8==7.1.1
