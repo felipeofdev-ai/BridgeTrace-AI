@@ -1,0 +1,106 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    container_name: bridgetrace-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_ENV=production
+      - LOG_LEVEL=info
+      - DATABASE_URL=postgresql://bridgetrace:bridgetrace@postgres:5432/bridgetrace
+      - REDIS_URL=redis://redis:6379/0
+    volumes:
+      - ./logs:/app/logs
+      - ./data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v2/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - bridgetrace
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: bridgetrace-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: bridgetrace
+      POSTGRES_USER: bridgetrace
+      POSTGRES_PASSWORD: bridgetrace
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bridgetrace"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - bridgetrace
+
+  redis:
+    image: redis:7-alpine
+    container_name: bridgetrace-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - bridgetrace
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: bridgetrace-prometheus
+    restart: unless-stopped
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - "9090:9090"
+    networks:
+      - bridgetrace
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: bridgetrace-grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - bridgetrace
+
+volumes:
+  postgres_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  bridgetrace:
+    driver: bridge
