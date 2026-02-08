@@ -290,7 +290,7 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file.
 **Felipe de Oliveira Fernandes**
 
 - GitHub: [@felipeofdev-ai](https://github.com/felipeofdev-ai)
-- LinkedIn: [Felipe Fernandes]([https://linkedin.com/in/felipe-fernandes](https://www.linkedin.com/in/felipe-de-oliveira-fernandes-941763110/)
+- LinkedIn:([https://linkedin.com/in/felipe-fernandes](https://www.linkedin.com/in/felipe-de-oliveira-fernandes-941763110/)
 - Email: felipe.of.dev@gmail.com
 
 ---
