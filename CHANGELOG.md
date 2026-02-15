@@ -1,6 +1,24 @@
 # Changelog
 
-All notable changes to BridgeTrace AI will be documented in this file.
+All notable changes to BridgeTrace AI are documented in this file.
+
+The format follows Keep a Changelog and Semantic Versioning.
+
+## [Unreleased]
+
+### Added
+- Enterprise credibility docs: `SECURITY.md`, `SLA.md`, `VERSIONING.md`, `THREAT_MODEL.md`.
+- Compliance readiness and architecture artifacts: `docs/COMPLIANCE_READINESS.md`, `SYSTEM_DESIGN.md`, `SCALING_STRATEGY.md`, `FAILURE_SCENARIOS.md`.
+- Business metrics endpoint `GET /metrics/business` and audit endpoint `GET /audit/logs`.
+- Tenant-aware quota controls and audit logging primitives.
+
+### Changed
+- Main middleware now supports tenant headers, optional auth enforcement, and enterprise audit trails.
+- Security module now supports API key validation and bearer-token based request authentication.
+
+### Documentation
+- Added `docs/PERFORMANCE_PROOF.md` with engine comparison matrix.
+- Added `docs/DISTRIBUTION_ROADMAP.md` for adoption strategy.
 
 ## [2.0.0] - 2026-02-08
 

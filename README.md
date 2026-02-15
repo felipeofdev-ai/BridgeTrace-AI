@@ -7,6 +7,9 @@
 ![Docker](https://img.shields.io/badge/Docker-Ready-blue?style=for-the-badge&logo=docker)
 ![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
 ![CI](https://img.shields.io/github/workflow/status/felipeofdev-ai/BridgeTrace-AI/CI?style=for-the-badge)
+![Benchmark Reproducible](https://img.shields.io/badge/Benchmark-Reproducible-success?style=for-the-badge)
+![Deterministic Engine](https://img.shields.io/badge/Deterministic%20Engine-Yes-success?style=for-the-badge)
+![External Validation](https://img.shields.io/badge/External%20Validation-Pending-orange?style=for-the-badge)
 
 **Enterprise-Grade Financial Traceability Engine**
 
@@ -19,6 +22,13 @@ Unified platform for tracing financial flows across banking systems (PIX), block
 ---
 
 ## ✨ Features
+
+## 🎯 Why BridgeTrace-AI
+
+**BridgeTrace-AI combines graph-native risk propagation with explainable outputs so compliance teams can act in minutes, not days.**
+
+---
+
 
 ### Core Capabilities
 - 🔗 **Unified Graph Model** - Banking + PIX + Crypto in one graph
@@ -85,15 +95,119 @@ alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
+### Generate Demo Data
+```bash
+python scripts/generate_synthetic_data.py --count 1000
+python examples/scripts/basic_trace.py
+```
+
+
+### Generate Public Dataset v1
+```bash
+python scripts/generate_public_dataset_v1.py --rows 500 --seed 42
+```
+
 ### Access Services
 - **API**: http://localhost:8000
 - **API Docs**: http://localhost:8000/api/v2/docs
 - **Grafana**: http://localhost:3000 (admin/admin)
 - **Prometheus**: http://localhost:9090
+- **Dashboard Demo**: http://localhost:8000/dashboard
+- **Business Metrics**: http://localhost:8000/metrics/business
+- **Hosted Playground**: http://localhost:8000/playground
+
+---
+
+
+## ⚡ 5-Minute Integration
+
+```bash
+# 1) Start API
+uvicorn app.main:app --reload
+
+# 2) Health check
+curl http://localhost:8000/api/v2/health
+
+# 3) Functional trace call
+curl -X POST http://localhost:8000/api/v2/trace \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: dev-key-1" \
+  -H "X-Tenant-ID: demo" \
+  -d '{"source_id":"bank_001","max_hops":5,"min_amount":0}'
+
+# 4) Risk by entity
+curl "http://localhost:8000/api/v2/risk/entity_001?days=30" \
+  -H "X-API-Key: dev-key-1" \
+  -H "X-Tenant-ID: demo"
+```
+
+Python SDK minimal example:
+```python
+from bridge_trace_sdk import BridgeTraceSDK
+
+sdk = BridgeTraceSDK("http://localhost:8000", api_key="dev-key-1", tenant_id="demo")
+print(sdk.trace("bank_001"))
+print(sdk.risk("entity_001"))
+```
+
+CLI example:
+```bash
+python scripts/bt_cli.py --base-url http://localhost:8000 --api-key dev-key-1 --tenant demo trace --source bank_001
+python scripts/bt_cli.py --base-url http://localhost:8000 --api-key dev-key-1 --tenant demo risk --entity entity_001
+```
+
+---
+
+## 🔬 External Reproducibility Proof
+
+Run the exact public proof pipeline (dataset + benchmark + checksums):
+
+```bash
+./scripts/run_external_proof.sh
+```
+
+This generates reproducible artifacts and SHA256 fingerprints under `artifacts/`.
+
+---
+
+## 🌐 Hosted Playground (Public Mode)
+
+Open instantly in browser:
+
+- `GET /playground`
+- `GET /api/v2/playground/ping`
+- `GET /api/v2/playground/sample-trace`
+- `GET /api/v2/playground/sample-risk`
+- `GET /api/v2/demo/replay`
 
 ---
 
 ## 📖 Documentation
+
+- [Fortune 500 Tier-1 Enhancements Roadmap](docs/FORTUNE500_TIER1_ENHANCEMENTS.md)
+- [Development Guide](docs/DEVELOPMENT.md)
+- [Deployment Guide](docs/DEPLOYMENT.md)
+- [Installation Guide](docs/INSTALLATION.md)
+- [API Reference](docs/API_REFERENCE.md)
+- [Architecture Decisions](docs/ARCHITECTURE.md)
+- [Algorithm Spec](docs/ALGORITHM.md)
+- [BridgeTrace Technical Paper v1](docs/papers/BRIDGETRACE_TECHNICAL_PAPER_V1.md)
+- [BridgeTrace Synthetic Dataset v1](docs/datasets/BRIDGETRACE_SYNTHETIC_DATASET_V1.md)
+- [Security Policy](SECURITY.md)
+- [SLA](SLA.md)
+- [Versioning Policy](VERSIONING.md)
+- [Threat Model](THREAT_MODEL.md)
+- [Compliance Readiness](docs/COMPLIANCE_READINESS.md)
+- [System Design](SYSTEM_DESIGN.md)
+- [Scaling Strategy](SCALING_STRATEGY.md)
+- [Failure Scenarios](FAILURE_SCENARIOS.md)
+- [Performance Proof](docs/PERFORMANCE_PROOF.md)
+- [Distribution Roadmap](docs/DISTRIBUTION_ROADMAP.md)
+- [5-Minute Quickstart](docs/QUICKSTART_5MIN.md)
+- [SDK Publishing Plan](docs/SDK_PUBLISHING.md)
+- [Formal Whitepaper v1.0.0](docs/papers/WHITEPAPER_FORMAL_V1_0.md)
+- [Scientific Changelog](docs/papers/SCIENTIFIC_CHANGELOG.md)
+- [Official Competitive Comparison](docs/COMPETITIVE_COMPARISON.md)
 
 ### API Endpoints
 
@@ -125,6 +239,15 @@ Content-Type: application/json
   "entity_id": "entity_001",
   "time_range_days": 30
 }
+```
+
+#### Professional API (Tier-1)
+```http
+POST /api/v2/trace
+GET /api/v2/risk/{entity_id}
+GET /api/v2/risk/propagation-map/{entity_id}
+GET /api/v2/graph/{entity_id}
+POST /api/v2/simulate
 ```
 
 #### AI Explanations

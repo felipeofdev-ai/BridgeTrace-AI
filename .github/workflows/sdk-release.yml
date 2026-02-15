@@ -1,0 +1,26 @@
+name: SDK Release Preparation
+
+on:
+  workflow_dispatch:
+
+jobs:
+  package-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Build python sdk package
+        run: |
+          pip install build
+          cd sdk/python
+          python -m build
+      - name: Validate js package metadata
+        run: |
+          cd sdk/js
+          node -e "const p=require('./package.json'); if(!p.name) process.exit(1);"
+      - name: Validate rust crate metadata
+        run: |
+          cd sdk/rust
+          grep '^name = ' Cargo.toml
