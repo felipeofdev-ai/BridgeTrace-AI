@@ -1,0 +1,11 @@
+{
+  "name": "@bridgetrace/sdk-js",
+  "version": "0.1.0",
+  "description": "Official JavaScript SDK for BridgeTrace API",
+  "type": "module",
+  "main": "index.js",
+  "files": ["index.js", "README.md"],
+  "scripts": {
+    "test": "node -e \"console.log('ok')\""
+  }
+}

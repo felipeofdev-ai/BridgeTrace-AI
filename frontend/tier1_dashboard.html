@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BridgeTrace Tier-1 Demo Dashboard</title>
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #0f172a; color: #e2e8f0; }
+    .wrap { padding: 20px; }
+    .cards { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+    .card { background: #111827; border: 1px solid #334155; border-radius: 10px; padding: 12px; }
+    ul { padding-left: 20px; }
+    svg { width: 100%; height: 450px; background: #020617; border-radius: 8px; }
+    .pill { display:inline-block; padding:2px 8px; border-radius:12px; background:#1f2937; border:1px solid #334155; margin-right:6px; }
+    .active-step { color: #22d3ee; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>BridgeTrace — Interactive Tier-1 Demo</h1>
+    <p>Interactive graph, risk color coding, timeline, and animated risk cascade replay.</p>
+    <div class="cards">
+      <div class="card">
+        <h3>Risk Propagation Graph</h3>
+        <svg id="graph"></svg>
+      </div>
+      <div class="card">
+        <h3>Timeline</h3>
+        <button hx-get="/api/v2/demo/timeline" hx-trigger="click" hx-target="#timeline" hx-swap="innerHTML">Reload Timeline</button>
+        <ul id="timeline"></ul>
+        <h3>Risk Cascade Replay</h3>
+        <button id="playReplay">▶ Play Replay</button>
+        <div id="replaySteps"></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+let nodeSelection = null;
+let replayData = [];
+
+fetch('/api/v2/demo/graph').then(r=>r.json()).then(data=>{
+  const svg = d3.select('#graph');
+  const width = svg.node().clientWidth;
+  const height = svg.node().clientHeight;
+
+  const simulation = d3.forceSimulation(data.nodes)
+    .force('link', d3.forceLink(data.links).id(d=>d.id).distance(120))
+    .force('charge', d3.forceManyBody().strength(-300))
+    .force('center', d3.forceCenter(width/2, height/2));
+
+  const link = svg.append('g').selectAll('line')
+    .data(data.links).enter().append('line')
+    .attr('stroke', '#64748b').attr('stroke-width', 2);
+
+  nodeSelection = svg.append('g').selectAll('circle')
+    .data(data.nodes).enter().append('circle')
+    .attr('r', 12)
+    .attr('fill', d => d.risk >= 0.7 ? '#ef4444' : (d.risk >= 0.4 ? '#f59e0b' : '#22c55e'))
+    .call(d3.drag()
+      .on('start', (event, d) => { if (!event.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+      .on('drag', (event, d) => { d.fx = event.x; d.fy = event.y; })
+      .on('end', (event, d) => { if (!event.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; }));
+
+  const label = svg.append('g').selectAll('text')
+    .data(data.nodes).enter().append('text')
+    .attr('fill', '#e2e8f0').attr('font-size', 11)
+    .text(d => `${d.id} (${Math.round(d.risk*100)}%)`);
+
+  simulation.on('tick', () => {
+    link.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+        .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+    nodeSelection.attr('cx', d => d.x).attr('cy', d => d.y);
+    label.attr('x', d => d.x + 14).attr('y', d => d.y + 4);
+  });
+});
+
+fetch('/api/v2/demo/timeline').then(r=>r.json()).then(data=>{
+  const el = document.getElementById('timeline');
+  el.innerHTML = data.events.map(e => `<li><strong>${e.label}</strong> — ${e.source} → ${e.target} | $${e.amount} | ${e.at}</li>`).join('');
+});
+
+fetch('/api/v2/demo/replay').then(r=>r.json()).then(data=>{
+  replayData = data.replay;
+  renderReplay(0);
+});
+
+function renderReplay(activeStep){
+  const el = document.getElementById('replaySteps');
+  el.innerHTML = replayData.map(s => `<div class="pill ${s.step===activeStep?'active-step':''}">#${s.step} ${s.source}→${s.target} Δ${s.risk_delta} Σ${s.cumulative_risk}</div>`).join('');
+}
+
+function highlightNode(nodeId){
+  if(!nodeSelection) return;
+  nodeSelection.attr('stroke', d => d.id===nodeId ? '#22d3ee' : null)
+               .attr('stroke-width', d => d.id===nodeId ? 4 : null);
+}
+
+document.getElementById('playReplay').addEventListener('click', async () => {
+  for(const step of replayData){
+    renderReplay(step.step);
+    highlightNode(step.target);
+    await new Promise(resolve => setTimeout(resolve, 700));
+  }
+  highlightNode('');
+});
+</script>
+</body>
+</html>

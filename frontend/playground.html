@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BridgeTrace Hosted Playground</title>
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <style>
+    body { font-family: Inter, Arial, sans-serif; background:#0b1220; color:#e5e7eb; margin:0; }
+    .wrap { max-width:960px; margin:30px auto; padding:0 16px; }
+    .card { background:#111827; border:1px solid #334155; border-radius:10px; padding:16px; margin-bottom:14px; }
+    button { background:#2563eb; color:white; border:0; border-radius:6px; padding:8px 12px; cursor:pointer; }
+    pre { background:#020617; border:1px solid #334155; border-radius:8px; padding:12px; overflow:auto; }
+    .row { display:flex; gap:10px; flex-wrap:wrap; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>BridgeTrace Hosted Playground</h1>
+    <p>Teste público sem instalação: trace, risk e replay em segundos.</p>
+
+    <div class="card">
+      <h3>1) Connectivity</h3>
+      <div class="row">
+        <button hx-get="/api/v2/playground/ping" hx-target="#out" hx-swap="innerHTML">Ping</button>
+        <button hx-get="/api/v2/playground/sample-trace" hx-target="#out" hx-swap="innerHTML">Sample Trace</button>
+        <button hx-get="/api/v2/playground/sample-risk" hx-target="#out" hx-swap="innerHTML">Sample Risk</button>
+      </div>
+      <pre id="out">Click any button to fetch a live sample payload.</pre>
+    </div>
+
+    <div class="card">
+      <h3>2) Quick API Calls</h3>
+      <pre>curl http://localhost:8000/api/v2/playground/ping
+curl http://localhost:8000/api/v2/playground/sample-trace
+curl http://localhost:8000/api/v2/playground/sample-risk</pre>
+    </div>
+  </div>
+<script>
+  document.body.addEventListener('htmx:afterRequest', function(evt) {
+    const text = evt.detail.xhr.responseText;
+    try {
+      document.getElementById('out').textContent = JSON.stringify(JSON.parse(text), null, 2);
+    } catch {
+      document.getElementById('out').textContent = text;
+    }
+  });
+</script>
+</body>
+</html>
